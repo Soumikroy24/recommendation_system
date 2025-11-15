@@ -36,7 +36,7 @@ async function getRecommendations() {
 function renderBooks(books, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = books.map(book => `
-    <div class="book-card bg-gray-800 rounded-xl shadow-lg p-4 cursor-pointer 
+    <div class="book-card bg-gray-800/70 rounded-xl shadow-lg p-4 cursor-pointer 
                 transform transition hover:shadow-xl hover:scale-105 duration-300">
 
       <img 

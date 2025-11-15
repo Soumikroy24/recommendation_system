@@ -1,90 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>📚 Book Recommender Gallery</title>
+  <meta charset="UTF-8" />
+  <title>StoryHive – Personalized Book Recommendations</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 
-<body class="bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen p-6">
+<body class="relative text-white min-h-screen overflow-x-hidden">
 
-  <!-- ✅ Navbar (now correctly placed inside <body>) -->
-  
-<nav class="bg-gray-900 text-white py-3 px-6 flex justify-between items-center shadow-lg">
-  <h1 class="text-xl font-bold text-indigo-400">📚 Book Recommender</h1>
-  <div class="space-x-6">
-    <a href="/" class="hover:text-indigo-400">Home</a>
-    <a href="#train" class="hover:text-indigo-400">Train</a>
-    <a href="#recommend" class="hover:text-indigo-400">Recommend</a>
-    <a href="#about" class="hover:text-indigo-400">About</a>
-  </div>
-</nav>
-
-
-  <!-- ✅ Loading Spinner Overlay (inside body, so it's visible on top of everything) -->
-  <div id="loadingSpinner"
-       class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-    <div class="loader border-t-4 border-indigo-400 rounded-full w-16 h-16 animate-spin"></div>
+  <!-- ===========================
+       BACKGROUND
+  ============================ -->
+  <div class="fixed inset-0 bg-[url('/static/assets/book_bg.png')]
+              bg-cover bg-center bg-no-repeat">
   </div>
 
-  <h1 class="text-4xl font-bold text-center text-indigo-400 mb-8">
-    📚 Book Recommendation Gallery
-  </h1>
+  <!-- Dark Overlay -->
+  <div class="fixed inset-0 bg-black/40"></div>
 
-  <!-- User Input Section -->
-  <div id="recommend" class="max-w-3xl mx-auto bg-gray-800 p-6 rounded-2xl shadow-lg mb-10">
-    <label class="block text-lg mb-2 text-gray-300">Enter User ID:</label>
-    <input id="userId" type="number" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white" placeholder="e.g., 123..">
+  <!-- Gradient Fade -->
+  <div class="fixed inset-0 bg-gradient-to-b from-indigo-900/20 via-black/40 to-gray-900/80"></div>
 
-    <button onclick="getRecommendations()" class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 rounded-lg transition">
-      🔍 Get Personalized Recommendations
-    </button>
-  </div>
-
-  <!-- Gallery Sections -->
-  <div id="svdppGallery" class="p-4">
-    <h2 class="text-2xl text-center text-indigo-300 mb-4">✨ SVD++ Recommendations</h2>
-    <div id="svdppCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-  </div>
-
-  <div class="flex justify-center mt-4">
-  <button onclick="showMore('svdppCards')" 
-          class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
-    Show More
-  </button>
-</div>
+  <!-- All actual page content must be above the background -->
+  <div class="relative z-10">
 
 
-  <div id="bprGallery" class="p-4 mt-10">
-    <h2 class="text-2xl text-center text-indigo-300 mb-4">🔥 BPR Recommendations</h2>
-    <div id="bprCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-  </div>
-
-  <div class="flex justify-center mt-4">
-  <button onclick="showMore('bprCards')" 
-          class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
-    Show More
-  </button>
-</div>
+    <!-- ===========================
+          NAVBAR
+    ============================ -->
+    <nav class="fixed top-0 left-0 w-full 
+            bg-black/60    <!-- slightly transparent -->
+            border-b border-pink-500/60
+            shadow-[0_0_20px_rgba(236,72,153,0.45)]
+            z-50 px-6 py-3 flex items-center justify-between">
 
 
-  <!-- Modal (View More) -->
-  <div id="bookModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-  <div class="bg-gray-900 rounded-2xl p-6 max-w-md w-full text-white shadow-2xl relative">
-    <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
-    <img id="modalImage" src="" class="w-48 h-72 object-cover rounded-lg mx-auto mb-4 shadow-lg">
-    <h2 id="modalTitle" class="text-2xl font-bold text-indigo-300 text-center"></h2>
-    <p id="modalAuthor" class="text-center text-gray-400 mt-1"></p>
-    <p id="modalRating" class="text-yellow-400 text-center mt-1"></p>
-    <p id="modalDesc" class="text-gray-300 mt-4 text-center"></p>
-    <button id="similarBtn" class="mt-5 bg-indigo-600 hover:bg-indigo-700 w-full py-2 rounded-lg transition-all">
-      Find Similar Books
-    </button>
-  </div>
-</div>
+      <!-- Logo + Name -->
+      <div class="flex items-center space-x-3">
+        <img src="/static/assets/logo_bee.png"
+             alt="StoryHive Logo"
+             class="h-12 w-12 rounded-full shadow-lg ring-2 ring-indigo-400/60 transform scale-110">
+        <span class="text-2xl font-bold text-indigo-300 tracking-wide drop-shadow">
+          StoryHive
+        </span>
+      </div>
 
+      <!-- Nav Links -->
+      <div class="space-x-8 text-lg font-medium">
+        <a href="/" class="text-gray-300 hover:text-indigo-400 transition">Home</a>
+        <a href="#train" class="text-gray-300 hover:text-indigo-400 transition">Train</a>
+        <a href="#recommend" class="text-gray-300 hover:text-indigo-400 transition">Recommend</a>
+        <a href="#about" class="text-gray-300 hover:text-indigo-400 transition">About</a>
+      </div>
+    </nav>
+
+    <div class="pt-28"></div>
+
+
+    <!-- ===========================
+         PAGE TITLE
+    ============================ -->
+    <h1 class="text-4xl font-extrabold text-center text-indigo-400 mb-8 flex items-center justify-center space-x-3 tracking-wide drop-shadow-xl">
+
+      <svg xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke-width="1.5" 
+          stroke="currentColor" 
+          class="h-8 w-8 text-indigo-300 drop-shadow-lg">
+        <path stroke-linecap="round" 
+              stroke-linejoin="round" 
+              d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+      </svg>
+
+      <span class="drop-shadow-2xl">Explore Books Portal</span>
+    </h1>
+
+
+    <!-- ===========================
+         USER INPUT
+    ============================ -->
+    <div id="recommend"
+        class="max-w-3xl mx-auto bg-gray-800/70 p-6 rounded-2xl shadow-lg mb-10 border border-gray-700">
+
+      <label class="block text-lg mb-2 text-gray-300 flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="currentColor" 
+            class="h-7 w-7 text-gray-300">
+          <path fill-rule="evenodd" 
+                d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" 
+                clip-rule="evenodd" />
+        </svg>
+        <span>Enter User ID:</span>
+      </label>
+
+      <input id="userId"
+            type="number"
+            class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white focus:border-indigo-400 outline-none"
+            placeholder="e.g., 123">
+
+      <button onclick="getRecommendations()"
+              class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 rounded-lg transition flex items-center justify-center space-x-2">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/>
+        </svg>
+
+        <span>Find Books Just for You</span>
+      </button>
+    </div>
+
+
+    <!-- ===========================
+         SPINNER
+    ============================ -->
+    <div id="loadingSpinner"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div class="loader border-t-4 border-indigo-400 rounded-full w-16 h-16 animate-spin"></div>
+    </div>
+
+
+    <!-- ===========================
+         SVD++ SECTION
+    ============================ -->
+    <div id="svdppGallery" class="p-4">
+
+      <h2 class="text-2xl text-center text-indigo-300 mb-4 flex items-center justify-center space-x-2">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.813 4.25l1.063 2.625a1 1 0 00.938.625h2.437a1 1 0 01.625 1.75L12.75 11a1 1 0 00-.313 1.125l1.063 2.625a1 1 0 01-1.75.625L9.813 13a1 1 0 00-1.125-.313l-2.625 1.063a1 1 0 01-.625-1.75L7 10.75a1 1 0 00.313-1.125L6.25 7a1 1 0 011.75-.625l1.813 1.625a1 1 0 001.125.313z"/>
+        </svg>
+
+        <span>Recommended for You</span>
+      </h2>
+
+      <div id="svdppCards"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      </div>
+
+      <div class="flex justify-center mt-4">
+        <button onclick="showMore('svdppCards')"
+                class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
+          Show More
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ===========================
+         BPR SECTION
+    ============================ -->
+    <div id="bprGallery" class="p-4 mt-10">
+
+      <h2 class="text-2xl text-center text-indigo-300 mb-4 flex items-center justify-center space-x-2">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 3c2.5 3 4 5.5 4 8a4 4 0 11-8 0c0-.75.13-1.49.38-2.18C7.2 11.73 6 13.74 6 16a6 6 0 0012 0c0-3.82-2.38-6.07-6-13z"/>
+        </svg>
+
+        <span>You May Also Enjoy</span>
+      </h2>
+
+      <div id="bprCards"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      </div>
+
+      <div class="flex justify-center mt-4">
+        <button onclick="showMore('bprCards')"
+                class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
+          Show More
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ===========================
+         MODAL POPUP
+    ============================ -->
+    <div id="bookModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+
+      <div class="bg-gray-900/70 rounded-2xl p-6 max-w-md w-full text-white shadow-2xl relative border border-gray-700">
+
+        <button onclick="closeModal()"
+                class="absolute top-2 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
+
+        <img id="modalImage"
+             class="w-48 h-72 object-cover rounded-lg mx-auto mb-4 shadow-lg">
+
+        <h2 id="modalTitle"
+            class="text-2xl font-bold text-indigo-300 text-center"></h2>
+
+        <p id="modalAuthor"
+           class="text-center text-gray-400 mt-1"></p>
+
+        <p id="modalRating"
+           class="text-indigo-300 text-center mt-1"></p>
+
+        <p id="modalDesc"
+           class="text-gray-300 mt-4 text-center"></p>
+
+        <button id="similarBtn"
+                class="mt-5 bg-indigo-600 hover:bg-indigo-700 w-full py-2 rounded-lg transition-all">
+          Find Similar Books
+        </button>
+      </div>
+    </div>
+
+
+  </div> <!-- END z-10 wrapper -->
 
   <script src="/static/script.js"></script>
+
 </body>
 </html>
