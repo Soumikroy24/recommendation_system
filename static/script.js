@@ -1,3 +1,10 @@
+// Hide sections until user enters an ID
+
+document.getElementById("svdTitle").style.display = "none";
+document.getElementById("bprTitle").style.display = "none";
+document.getElementById("svdppGallery").style.display = "none";
+document.getElementById("bprGallery").style.display = "none";
+
 /* ======================================================
    GET USER RECOMMENDATIONS
 ====================================================== */
@@ -18,12 +25,23 @@ async function getRecommendations() {
       return;
     }
 
-    renderBooks(data["SVD++_Recommendations"], "svdppCards");
-    renderBooks(data["BPR_Recommendations"], "bprCards");
+    const svdBooks = data["SVD++_Recommendations"];
+    const bprBooks = data["BPR_Recommendations"];
+
+    // Show titles + sections only after data arrives
+    document.getElementById("svdTitle").style.display = "block";
+    document.getElementById("bprTitle").style.display = "block";
+    document.getElementById("svdppGallery").style.display = "block";
+    document.getElementById("bprGallery").style.display = "block";
+
+    // Render cards
+    renderBooks(svdBooks, "svdppCards");
+    renderBooks(bprBooks, "bprCards");
+
 
 
   } catch (err) {
-    alert("❌ Failed to load recommendations:\n" + err);
+    alert("Failed to load recommendations:\n" + err);
   } finally {
     spinner.classList.add("hidden");
   }
@@ -43,10 +61,17 @@ function renderBooks(books, containerId) {
         src="${book.image_url || '/static/assets/no_cover.png'}"
         alt="${book.title}" 
         referrerpolicy="no-referrer"
-        onerror="this.onerror=null; this.src='/static/assets/no_cover.png';"
-        class="w-full h-80 object-cover rounded-2xl shadow-md mb-3 
-               transition-transform duration-300 hover:scale-105"
+        class="book-cover w-full h-80 object-cover rounded-2xl shadow-md mb-3 transition-transform duration-300 hover:scale-105"
+        onload="
+          if (this.naturalWidth <= 2 || this.naturalHeight <= 2) {
+            this.src = '/static/assets/no_cover.png';
+          }
+        "
+        onerror="
+          this.src = '/static/assets/no_cover.png';
+        "
       />
+
 
       <h3 class="text-lg font-semibold text-indigo-300 truncate">${book.title}</h3>
       <p class="text-gray-400 truncate">by ${book.author}</p>
@@ -71,7 +96,24 @@ function renderBooks(books, containerId) {
 ====================================================== */
 
 function viewMore(book) {
-  document.getElementById("modalImage").src = book.image_url || '/static/assets/no_cover.png';
+  const modalImg = document.getElementById("modalImage");
+
+  // Load the image
+  modalImg.src = book.image_url || '/static/assets/no_cover.png';
+
+  //  Fix cases where image loads but is actually blank (1x1 px Goodreads bug)
+  modalImg.onload = function () {
+    if (this.naturalWidth <= 2 || this.naturalHeight <= 2) {
+      this.src = '/static/assets/no_cover.png';
+    }
+  };
+
+  //  Fix broken URLs
+  modalImg.onerror = function () {
+    this.src = '/static/assets/no_cover.png';
+  };
+
+  // Fill modal content
   document.getElementById("modalTitle").innerText = book.title;
   document.getElementById("modalAuthor").innerText = "by " + book.author;
   document.getElementById("modalRating").innerText = "⭐ " + book.rating;
@@ -90,9 +132,15 @@ function viewMore(book) {
       if (d.error) {
         document.getElementById("modalDesc").innerHTML = "❌ " + d.error;
       } else {
-        const htmlList = d.Similar_Books.map(b =>
-          `<li class="mt-1">📘 <b>${b.title}</b> <i>by ${b.author}</i></li>`
-        ).join("");
+        const htmlList = d.Similar_Books.map((b, i) =>
+            `<li class="mt-2 text-left">
+                <span class="font-bold text-indigo-300">${i + 1}.</span>
+                <b class="text-white">${b.title}</b>
+                <i class="text-gray-400">by ${b.authors || "Unknown"}</i>
+            </li>`
+          ).join("");
+
+
 
         document.getElementById("modalDesc").innerHTML =
           `<b>Similar Books:</b><ul class="mt-2">${htmlList}</ul>`;
@@ -100,12 +148,13 @@ function viewMore(book) {
 
     } catch (err) {
       document.getElementById("modalDesc").innerHTML =
-        "❌ Error fetching similar books.";
+        "Error fetching similar books.";
     }
 
     btn.innerText = "Find Similar Books";
   };
 }
+
 
 /* ======================================================
    CLOSE MODAL

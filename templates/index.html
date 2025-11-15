@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>StoryHive – Personalized Book Recommendations</title>
+  <title>StoryHive - Personalized Book Recommendations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
@@ -125,19 +125,12 @@
 
 
     <!-- ===========================
-         SVD++ SECTION
-    ============================ -->
+     SVD++ SECTION
+    =============================== -->
     <div id="svdppGallery" class="p-4">
 
       <h2 class="text-2xl text-center text-indigo-300 mb-4 flex items-center justify-center space-x-2">
-
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9.813 4.25l1.063 2.625a1 1 0 00.938.625h2.437a1 1 0 01.625 1.75L12.75 11a1 1 0 00-.313 1.125l1.063 2.625a1 1 0 01-1.75.625L9.813 13a1 1 0 00-1.125-.313l-2.625 1.063a1 1 0 01-.625-1.75L7 10.75a1 1 0 00.313-1.125L6.25 7a1 1 0 011.75-.625l1.813 1.625a1 1 0 001.125.313z"/>
-        </svg>
-
-        <span>Recommended for You</span>
+        <span id="svdTitle">Recommended for You</span>
       </h2>
 
       <div id="svdppCards"
@@ -150,7 +143,9 @@
           Show More
         </button>
       </div>
+
     </div>
+
 
 
     <!-- ===========================
@@ -159,14 +154,7 @@
     <div id="bprGallery" class="p-4 mt-10">
 
       <h2 class="text-2xl text-center text-indigo-300 mb-4 flex items-center justify-center space-x-2">
-
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 3c2.5 3 4 5.5 4 8a4 4 0 11-8 0c0-.75.13-1.49.38-2.18C7.2 11.73 6 13.74 6 16a6 6 0 0012 0c0-3.82-2.38-6.07-6-13z"/>
-        </svg>
-
-        <span>You May Also Enjoy</span>
+        <span id="bprTitle">You May Also Enjoy</span>
       </h2>
 
       <div id="bprCards"
@@ -179,7 +167,9 @@
           Show More
         </button>
       </div>
+
     </div>
+
 
 
     <!-- ===========================
@@ -194,7 +184,14 @@
                 class="absolute top-2 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
 
         <img id="modalImage"
-             class="w-48 h-72 object-cover rounded-lg mx-auto mb-4 shadow-lg">
+          class="w-48 h-72 object-cover rounded-lg mx-auto mb-4 shadow-lg"
+          onload="
+            if (this.naturalWidth <= 2 || this.naturalHeight <= 2) {
+              this.src = '/static/assets/no_cover.png';
+            }
+          "
+          onerror="this.src='/static/assets/no_cover.png';">
+
 
         <h2 id="modalTitle"
             class="text-2xl font-bold text-indigo-300 text-center"></h2>
